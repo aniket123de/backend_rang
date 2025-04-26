@@ -1,7 +1,8 @@
-const express = from('express');
-const cors = from('cors');
-const { GoogleGenerativeAI } = from('@google/generative-ai');
-const dotenv = from('dotenv');
+import express from 'express';
+import cors from 'cors';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+
 
 dotenv.config();
 
