@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const dotenv = require('dotenv');
+const express = from('express');
+const cors = from('cors');
+const { GoogleGenerativeAI } = from('@google/generative-ai');
+const dotenv = from('dotenv');
 
 dotenv.config();
 
