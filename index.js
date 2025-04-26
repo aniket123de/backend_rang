@@ -2,10 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fetch from 'node-fetch'; // Import node-fetch
-
-// Set fetch globally (for some libraries that expect it)
-globalThis.fetch = fetch;
+import fetch from 'node-fetch'; // Import node-fetch to use fetch in Node.js
 
 // Load environment variables from .env file
 dotenv.config();
