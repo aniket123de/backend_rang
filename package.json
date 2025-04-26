@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "content-suggestion-backend",
   "version": "1.0.0",
   "description": "Backend for generating content suggestions using Google Generative AI",
