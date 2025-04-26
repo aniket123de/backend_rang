@@ -1,7 +1,7 @@
-import express from 'express';
-import cors from 'cors';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import dotenv from 'dotenv';
+const express = require('express');
+const cors = require('cors');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -26,7 +26,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
     `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response; // Ensure you're awaiting the response if it's a Promise.
+    const response = await result.response;
 
     let suggestions = [];
     try {
