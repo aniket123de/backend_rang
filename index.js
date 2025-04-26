@@ -1,8 +1,8 @@
-// server/index.js
 import express from 'express';
 import cors from 'cors';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const app = express();
@@ -26,7 +26,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
     `;
 
     const result = await model.generateContent(prompt);
-    const response = result.response;
+    const response = await result.response; // Ensure you're awaiting the response if it's a Promise.
 
     let suggestions = [];
     try {
@@ -51,7 +51,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
     return res.status(200).json({ suggestions });
 
   } catch (error) {
-    console.error('Error generating content:', error);
+    console.error('Error generating content:', error.message, error.stack);
     return res.status(500).json({ error: 'Failed to generate suggestions' });
   }
 });
