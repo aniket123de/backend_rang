@@ -9,6 +9,8 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+const fetch = require('node-fetch');
+
 
 // Enable CORS with specific configuration
 app.use(cors({
