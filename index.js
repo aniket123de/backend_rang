@@ -19,10 +19,11 @@ app.use(cors({
 
 app.use(express.json());
 
-// Define your POST route
+// POST route to handle content generation request
 app.post('/api/generate-suggestions', async (req, res) => {
   const { creatorNiche, pastContent, audience } = req.body;
 
+  // Validate input
   if (!creatorNiche) {
     return res.status(400).json({ error: 'Content niche is required' });
   }
@@ -34,7 +35,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
     // Get the generative model
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-    // Construct the prompt
+    // Construct the prompt for the AI
     const prompt = `
       You are a specialized content strategy AI assistant designed to help content creators generate fresh, engaging content ideas.
       
@@ -101,6 +102,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
   }
 });
 
+// Start server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
