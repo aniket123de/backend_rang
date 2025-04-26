@@ -9,8 +9,6 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const fetch = require('node-fetch');
-
 
 // Enable CORS with specific configuration
 app.use(cors({
@@ -70,7 +68,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
     // Generate content
     const result = await model.generateContent(prompt);
     const response = result.response;
-    
+
     // Parse the response text as JSON
     let suggestions = [];
     try {
@@ -82,7 +80,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
       }
     } catch (err) {
       console.error('Error parsing JSON response:', err);
-      
+
       // Fallback to a basic response format if JSON parsing fails
       suggestions = [
         {
