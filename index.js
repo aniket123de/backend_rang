@@ -34,7 +34,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
     // Get the generative model
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Construct the prompt for the AI
     const prompt = `
