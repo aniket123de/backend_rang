@@ -53,7 +53,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
       3. Estimated engagement potential (High, Medium, or Low)
       4. Production difficulty (Easy, Moderate, or Challenging)
       
-      Format your response as a structured JSON array with the following format:
+      Format your response as a valid JSON array with the following format:
       [
         {
           "title": "Title of the content idea",
@@ -64,7 +64,7 @@ app.post('/api/generate-suggestions', async (req, res) => {
         ...
       ]
       
-      Return ONLY the JSON array, without any additional text, commentary, or formatting.
+      IMPORTANT: Return ONLY the raw JSON array without markdown code blocks, backticks, or any other formatting. Do not include \`\`\`json or \`\`\` around the response.
     `;
     
     // Generate content
@@ -72,19 +72,30 @@ app.post('/api/generate-suggestions', async (req, res) => {
     const response = result.response;
     const responseText = response.text();
     
+    console.log('Raw response:', responseText); // Log the raw response for debugging
+    
     // Parse the response text as JSON
     let suggestions = [];
     
     try {
-      // First try direct parsing
-      suggestions = JSON.parse(responseText);
+      // First, clean up the response - remove markdown code blocks if present
+      let cleanedResponse = responseText;
+      
+      // Remove markdown code block markers if present
+      cleanedResponse = cleanedResponse.replace(/```json\s*/g, '');
+      cleanedResponse = cleanedResponse.replace(/```\s*/g, '');
+      
+      // Try direct parsing with cleaned response
+      suggestions = JSON.parse(cleanedResponse);
+      
     } catch (parseError) {
       console.error('Initial JSON parsing failed:', parseError.message);
+      console.log('Cleaned response that failed parsing:', cleanedResponse);
       
-      // Try to extract JSON with regex if direct parsing fails
+      // Try to extract JSON array pattern
       try {
         // Look for anything that resembles a JSON array
-        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*?\}\s*\]/);
         if (jsonMatch) {
           suggestions = JSON.parse(jsonMatch[0]);
         } else {
@@ -92,7 +103,6 @@ app.post('/api/generate-suggestions', async (req, res) => {
         }
       } catch (extractError) {
         console.error('JSON extraction failed:', extractError.message);
-        console.log('Raw response:', responseText);
         
         // Provide fallback suggestions
         suggestions = [
