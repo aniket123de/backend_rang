@@ -23,19 +23,19 @@ app.use(express.json());
 // POST route to handle content generation request
 app.post('/api/generate-suggestions', async (req, res) => {
   const { creatorNiche, pastContent, audience } = req.body;
-
+  
   // Validate input
   if (!creatorNiche) {
     return res.status(400).json({ error: 'Content niche is required' });
   }
-
+  
   try {
     // Initialize Gemini API with the API key from the .env file
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
+    
     // Get the generative model
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
+    
     // Construct the prompt for the AI
     const prompt = `
       You are a specialized content strategy AI assistant designed to help content creators generate fresh, engaging content ideas.
@@ -63,36 +63,52 @@ app.post('/api/generate-suggestions', async (req, res) => {
         },
         ...
       ]
+      
+      Return ONLY the JSON array, without any additional text, commentary, or formatting.
     `;
-
+    
     // Generate content
     const result = await model.generateContent(prompt);
     const response = result.response;
-
+    const responseText = response.text();
+    
     // Parse the response text as JSON
     let suggestions = [];
+    
     try {
-      const jsonMatch = response.text().match(/\[[\s\S]*?\]/);
-      if (jsonMatch) {
-        suggestions = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('Could not parse JSON response');
-      }
-    } catch (err) {
-      console.error('Error parsing JSON response:', err);
-
-      // Fallback to a basic response format if JSON parsing fails
-      suggestions = [
-        {
-          title: "Content Idea for " + creatorNiche,
-          description: "We had trouble formatting suggestions, but here's a general idea for your niche.",
-          engagement: "Medium",
-          difficulty: "Moderate"
+      // First try direct parsing
+      suggestions = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Initial JSON parsing failed:', parseError.message);
+      
+      // Try to extract JSON with regex if direct parsing fails
+      try {
+        // Look for anything that resembles a JSON array
+        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (jsonMatch) {
+          suggestions = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Could not find valid JSON array in response');
         }
-      ];
+      } catch (extractError) {
+        console.error('JSON extraction failed:', extractError.message);
+        console.log('Raw response:', responseText);
+        
+        // Provide fallback suggestions
+        suggestions = [
+          {
+            title: "Content Idea for " + creatorNiche,
+            description: "We had trouble formatting suggestions, but here's a general idea for your niche.",
+            engagement: "Medium",
+            difficulty: "Moderate"
+          }
+        ];
+      }
     }
-
+    
+    // Return the suggestions
     return res.status(200).json({ suggestions });
+    
   } catch (error) {
     console.error('Error generating content:', {
       message: error.message,
